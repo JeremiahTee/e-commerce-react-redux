@@ -11,6 +11,7 @@ import {
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import agent from '../../app/api/agent';
 import { Product } from '../../app/models/product';
 
 export const ProductDetails = () => {
@@ -19,9 +20,8 @@ export const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get(`http://localhost:5000/api/products/${id}`)
-      .then((response) => setProducts(response.data))
+    agent.Catalog.details(parseInt(id))
+      .then((response) => setProducts(response))
       .catch((error) => console.log(error))
       .finally(() => setLoading(false));
   }, [id]);
