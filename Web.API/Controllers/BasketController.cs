@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Reflection.Metadata.Ecma335;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.API.Data;
+using Web.API.DTOs;
 using Web.API.Entities;
 
 namespace Web.API.Controllers
@@ -13,18 +15,18 @@ namespace Web.API.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<Basket>> GetBasket()
+        [HttpGet(Name = "GetBasket")]
+        public async Task<ActionResult<BasketDto>> GetBasket()
         {
             var basket = await RetrieveBasket();
 
             if (basket == null) return NotFound();
 
-            return basket;
+            return MapBasketToDto(basket);
         }
 
-        [HttpPost] //api/basket?productId=3&quantity=2
-        public async Task<ActionResult> AddItemToBasket(int productId, int quantity)
+        [HttpPost]
+        public async Task<ActionResult<BasketDto>> AddItemToBasket(int productId, int quantity)
         {
             var basket = await RetrieveBasket() ?? CreateBasket();
 
@@ -36,7 +38,7 @@ namespace Web.API.Controllers
 
             var result = await _context.SaveChangesAsync() > 0;
 
-            if (result) return StatusCode(201);
+            if (result) return CreatedAtRoute("GetBasket", MapBasketToDto(basket));
 
             return BadRequest(new ProblemDetails { Title = "Problem saving item to basket" });
         }
@@ -45,9 +47,17 @@ namespace Web.API.Controllers
         public async Task<ActionResult> RemoveBasketItem(int productId, int quantity)
         {
             // get basket
-            // remove item or reduce quantity
-            // save changes
-            return Ok();
+            var basket = await RetrieveBasket();
+
+            if (basket == null) return NotFound();
+
+            basket.RemoveItem(productId, quantity);
+
+            var result = await _context.SaveChangesAsync() > 0;
+
+            if (result) return Ok();
+
+            return BadRequest(new ProblemDetails { Title = "Problem removing item from the basket" });
         }
 
         private Basket CreateBasket()
@@ -68,6 +78,25 @@ namespace Web.API.Controllers
                 .ThenInclude(p => p.Product)
                 .FirstOrDefaultAsync(x => x.BuyerId == Request.Cookies["buyerId"]);
             return basket;
+        }
+
+        private BasketDto MapBasketToDto(Basket basket)
+        {
+            return new BasketDto
+            {
+                Id = basket.Id,
+                BuyerId = basket.BuyerId,
+                Items = basket.Items.Select(item => new BasketItemDto
+                {
+                    ProductId = item.ProductId,
+                    Name = item.Product.Name,
+                    Price = item.Product.Price,
+                    PictureUrl = item.Product.PictureUrl,
+                    Type = item.Product.Type,
+                    Brand = item.Product.Brand,
+                    Quantity = item.Quantity
+                }).ToList()
+            };
         }
     }
 }
