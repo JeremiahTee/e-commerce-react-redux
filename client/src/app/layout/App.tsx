@@ -15,7 +15,6 @@ import { NotFound } from '../errors/NotFound';
 import BasketPage from '../../features/baskets/BasketPage';
 import { useStoreContext } from '../context/StoreContext';
 import { getCookie } from '../util/util';
-import { Agent } from 'https';
 import agent from '../api/agent';
 import { LoadingComponent } from './LoadingComponent';
 import { CheckoutPage } from '../../features/checkout/CheckoutPage';
