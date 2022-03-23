@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import { Link, NavLink } from 'react-router-dom';
-import { useStoreContext } from '../context/StoreContext';
 import { useAppSelector } from '../store/configureStore';
 
 interface Props {

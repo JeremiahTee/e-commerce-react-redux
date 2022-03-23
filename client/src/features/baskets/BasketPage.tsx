@@ -22,7 +22,6 @@ import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
 import { removeItem, setBasket } from './basketSlice';
 
 export default function BasketPage() {
-  // const { basket, setBasket, removeItem } = useStoreContext();
   const { basket } = useAppSelector((state) => state.basket);
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState({
