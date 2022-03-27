@@ -126,7 +126,7 @@ export const ProductDetails = () => {
               disabled={
                 item?.quantity === quantity || (!item && quantity === 0)
               }
-              loading={status.includes('pendingRemoveItem' + item?.productId)}
+              loading={status.includes('pending')}
               onClick={handleUpdateCart}
               sx={{ height: '55px' }}
               color='primary'
