@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Web.API.Data;
 using Web.API.Entities;
+using Web.API.Extensions;
 
 namespace Web.API.Controllers
 {
@@ -15,9 +16,13 @@ namespace Web.API.Controllers
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Product>>> GetProducts()
+    public async Task<ActionResult<List<Product>>> GetProducts(string orderBy)
     {
-      return await _context.Products.ToListAsync();
+      var query = _context.Products
+      .Sort(orderBy)
+      .AsQueryable();
+
+      return await query.ToListAsync();
     }
 
     [HttpGet("{id}")]
